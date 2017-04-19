@@ -1,5 +1,5 @@
-{ mkDerivation, base, cgi, JuicyPixels, JuicyPixels-extra, lucid
-, stdenv
+{ mkDerivation, async, base, cgi, directory, filelock, filepath
+, JuicyPixels, JuicyPixels-extra, lucid, stdenv, text
 }:
 mkDerivation {
   pname = "simple-gallery";
@@ -8,7 +8,8 @@ mkDerivation {
   isLibrary = false;
   isExecutable = true;
   executableHaskellDepends = [
-    base cgi JuicyPixels JuicyPixels-extra lucid
+    async base cgi directory filelock filepath JuicyPixels
+    JuicyPixels-extra lucid text
   ];
   description = "Simple CGI image gallery";
   license = stdenv.lib.licenses.bsd2;
