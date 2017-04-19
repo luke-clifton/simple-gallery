@@ -62,23 +62,23 @@ updateCache file = do
         liftIO $ withMagickWandGenesis $ do
             (r,p) <- magickWand
             readImage p (pack file)
-            scaleImage p 100 100
+            setImageCompressionQuality p 30
+            scaleImage p 80 80
             writeImage p (Just $ pack cache)
 
     else return ()
 
 generateListing :: MonadReader Config m => [FilePath] -> HtmlT m ()
-generateListing fps = doctypehtml_
-    $ body_ [style_ "padding: 0px; margin: 0px; background: black"]
-    $ ul_ [ style_ "list-style-type: none; line-height: 0px; padding: 0px; margin: 0px" ]
-    $ mapM_ imageRow fps
+generateListing fps = doctypehtml_ $ do
+    head_ $ style_ "li { display: inline; }"
+    body_ [style_ "padding: 0px; margin: 0px; background: black"]
+        $ ul_ [ style_ "list-style-type: none; line-height: 0px; padding: 0px; margin: 0px; text-align: center;" ]
+        $ mapM_ imageRow fps
     where
         imageRow :: MonadReader Config m => FilePath -> HtmlT m ()
         imageRow fp = do
             cached <- pack <$> toCachePath fp
-            li_ [ style_ "float: left"]
-                $ a_ [ href_ . pack $ fp ]
-                $ img_ [ src_ cached ]
+            li_ $ a_ [ href_ . pack $ fp ] $ img_ [ src_ cached ]
 
 loadImages :: (MonadReader Config m, MonadIO m) => m [FilePath]
 loadImages = do
