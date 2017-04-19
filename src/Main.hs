@@ -5,8 +5,6 @@
 {-# LANGUAGE RecordWildCards #-}
 module Main where
 
-import Codec.Picture
-import Codec.Picture.Extra
 import Control.Monad
 import Control.Monad.IO.Class
 import Control.Monad.Reader
@@ -14,6 +12,7 @@ import Data.List
 import qualified Data.ByteString.Lazy as BS
 import Data.Maybe
 import Data.Text (Text, pack)
+import Graphics.ImageMagick.MagickWand
 import Lucid
 import System.Directory
 import System.Environment
@@ -60,8 +59,12 @@ updateCache file = do
 
     if expired
     then do
-        eimg <- liftIO $ fmap (ImageRGB8 . scaleBilinear 100 100 . convertRGB8) <$> readImage file
-        liftIO $ either putStrLn (saveJpgImage 90 cache) eimg
+        liftIO $ withMagickWandGenesis $ do
+            (r,p) <- magickWand
+            readImage p (pack file)
+            scaleImage p 100 100
+            writeImage p (Just $ pack cache)
+
     else return ()
 
 generateListing :: MonadReader Config m => [FilePath] -> HtmlT m ()

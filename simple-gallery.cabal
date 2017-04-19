@@ -24,8 +24,7 @@ executable simple-gallery
                      , directory
                      , filelock
                      , filepath
-                     , JuicyPixels
-                     , JuicyPixels-extra
+                     , imagemagick
                      , lucid
                      , mtl
                      , text
