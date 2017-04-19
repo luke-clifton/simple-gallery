@@ -82,17 +82,9 @@ generateListing fps = doctypehtml_
 
 loadImages :: (MonadReader Config m, MonadIO m) => m [FilePath]
 loadImages = do
-    dir <- asks cacheDir
-    lock <- liftIO $ do
-        createDirectoryIfMissing False dir
-        tryLockFile "cache.lock" Exclusive
-    case lock of
-        -- TODO: A little concurrency would be nice.
-        Just _ -> do
-            imgs <- liftIO $ filter isImage <$> listDirectory "."
-            mapM_ updateCache imgs
-            return imgs
-        Nothing -> liftIO $ filter isImage <$> listDirectory "."
+    imgs <- liftIO $ filter isImage <$> listDirectory "."
+    mapM_ updateCache imgs
+    return imgs
 
 main :: IO ()
 main = do
@@ -101,6 +93,12 @@ main = do
         [] -> return Config{cacheDir="cache"}
         _ -> hPutStrLn stderr "Bad arguments: usage: simple-gallery [CACHE_DIR]" >> exitFailure
     flip runReaderT config $ do
+        dir <- asks cacheDir
+        liftIO $ do
+            createDirectoryIfMissing False dir
+            lockFile (dir </> "cache.lock") Exclusive
         imgs <- sort <$> loadImages
-        doc <- renderBST (generateListing imgs)
-        liftIO $ BS.putStr doc
+        doc <- renderBST $ generateListing imgs
+        liftIO $ do
+            withFile "index.html.tmp" WriteMode $ \h -> BS.hPutStr h doc
+            renameFile "index.html.tmp" "index.html"
