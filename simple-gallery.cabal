@@ -27,6 +27,7 @@ executable simple-gallery
                      , imagemagick
                      , lucid
                      , mtl
+                     , optparse-applicative
                      , text
   hs-source-dirs:      src
   default-language:    Haskell2010

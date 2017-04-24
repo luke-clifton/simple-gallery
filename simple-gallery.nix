@@ -1,5 +1,5 @@
 { mkDerivation, base, bytestring, directory, filelock, filepath
-, imagemagick, lucid, mtl, stdenv, text
+, imagemagick, lucid, mtl, optparse-applicative, stdenv, text
 }:
 mkDerivation {
   pname = "simple-gallery";
@@ -9,7 +9,7 @@ mkDerivation {
   isExecutable = true;
   executableHaskellDepends = [
     base bytestring directory filelock filepath imagemagick lucid mtl
-    text
+    optparse-applicative text
   ];
   description = "Simple CGI image gallery";
   license = stdenv.lib.licenses.bsd2;
